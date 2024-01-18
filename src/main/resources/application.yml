@@ -1,0 +1,35 @@
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: alphamart
+  datasource:
+    url: jdbc:h2:file:./ai-assistant.h2
+    username: sa
+  jackson:
+    default-property-inclusion: always
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+
+server:
+  servlet:
+    context-path: /alphamart
+    
+flyway:
+  baselineOnMigrate: true
+
+springdoc:
+  show-actuator: false
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+          
+logging:
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(---){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr(%10t){magenta} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}" 
+
+management:
+  endpoint:
+    health:
+      enabled: true
+      probes:
+        enabled: true
