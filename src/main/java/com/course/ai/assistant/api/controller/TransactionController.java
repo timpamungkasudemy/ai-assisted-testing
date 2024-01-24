@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.course.ai.assistant.api.response.Transaction;
 import com.course.ai.assistant.constant.JsonFormatConstants;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/transaction", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Transaction")
 public class TransactionController {
 
   @GetMapping(path = "/v1/transactions/{customerUUID}", produces = MediaType.APPLICATION_JSON_VALUE)

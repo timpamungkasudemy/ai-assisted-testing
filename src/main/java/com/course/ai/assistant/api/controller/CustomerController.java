@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.course.ai.assistant.api.response.Customer;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/customer", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Customer")
 public class CustomerController {
 
   @GetMapping(path = "/v1/consumer", produces = MediaType.APPLICATION_JSON_VALUE)

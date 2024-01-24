@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +16,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.course.ai.assistant.api.response.SimpleMessage;
 import com.course.ai.assistant.util.DelayUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/basic", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Basic")
 public class BasicController {
 
-  @GetMapping(path = "/time", produces = MediaType.TEXT_PLAIN_VALUE)
+  private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+  @GetMapping(path = "/time", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get current time")
-  public String getTime() {
-    return LocalTime.now().toString();
+  public SimpleMessage getTime() {
+    var now = DATE_TIME_FORMATTER.format(LocalTime.now());
+    return new SimpleMessage(now);
   }
 
   @GetMapping(path = "/fast", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,11 +107,11 @@ public class BasicController {
         + RandomStringUtils.randomNumeric(4));
   }
 
-  @GetMapping(path = "/who-am-i", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "/who-am-i", produces = MediaType.TEXT_PLAIN_VALUE)
   @Operation(summary = "Get current IP address")
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
-  public SimpleMessage whoAmI() throws SocketException, UnknownHostException {
-    return new SimpleMessage("I run on " + InetAddress.getLocalHost().getHostAddress());
+  public String whoAmI() throws SocketException, UnknownHostException {
+    return "I run on " + InetAddress.getLocalHost().getHostAddress();
   }
 
 }
