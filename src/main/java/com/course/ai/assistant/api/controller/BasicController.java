@@ -64,17 +64,17 @@ public class BasicController {
     var random = ThreadLocalRandom.current().nextInt(100);
 
     switch (random % 10) {
-      case 0:
-        return ResponseEntity.badRequest().body(null);
-      case 1:
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-      case 2:
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
-      case 3:
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-      default:
-        return ResponseEntity
-            .ok(new SimpleMessageResponse("Response from API, random number" + RandomStringUtils.randomNumeric(6)));
+    case 0:
+      return ResponseEntity.badRequest().body(null);
+    case 1:
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    case 2:
+      return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
+    case 3:
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    default:
+      return ResponseEntity
+          .ok(new SimpleMessageResponse("Response from API, random number" + RandomStringUtils.randomNumeric(6)));
     }
   }
 
@@ -119,11 +119,11 @@ public class BasicController {
     return "I run on " + InetAddress.getLocalHost().getHostAddress();
   }
 
-  @RequestMapping(value = {
-      "/echo" }, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+  @RequestMapping(value = { "/echo" }, consumes = { MediaType.APPLICATION_JSON_VALUE,
+      MediaType.TEXT_PLAIN_VALUE }, produces = MediaType.TEXT_PLAIN_VALUE)
   @Operation(summary = "Echo the HTTP request (URL, query parameters, headers, request body).")
   public ResponseEntity<String> echo(HttpServletRequest request,
-      @RequestBody(required = false) @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body") String body) {
+      @RequestBody(required = false) @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body", required = false) String body) {
 
     var response = new StringBuilder();
 
@@ -133,16 +133,29 @@ public class BasicController {
     response.append(StringUtils.LF);
     response.append(StringUtils.LF);
 
+    // Append HTTP request method
+    response.append("HTTP Method: ");
+    response.append(request.getMethod());
+    response.append(StringUtils.LF);
+    response.append(StringUtils.LF);
+
     // Append query parameters
     response.append("Query Parameters: ");
     response.append(StringUtils.LF);
     var parameterNames = request.getParameterNames();
     while (parameterNames.hasMoreElements()) {
-      String paramName = parameterNames.nextElement();
-      String paramValue = request.getParameter(paramName);
+      var paramName = parameterNames.nextElement();
+      var paramValues = request.getParameterValues(paramName);
+      response.append("  - ");
       response.append(paramName);
       response.append(": ");
-      response.append(paramValue);
+
+      for (int i = 0; i < paramValues.length; i++) {
+        response.append(paramValues[i]);
+        if (i < paramValues.length - 1) {
+          response.append(",");
+        }
+      }
       response.append(StringUtils.LF);
     }
     response.append(StringUtils.LF);
@@ -152,11 +165,19 @@ public class BasicController {
     response.append(StringUtils.LF);
     Enumeration<String> headerNames = request.getHeaderNames();
     while (headerNames.hasMoreElements()) {
-      String headerName = headerNames.nextElement();
-      String headerValue = request.getHeader(headerName);
+      var headerName = headerNames.nextElement();
+      var headerValues = request.getHeaders(headerName);
+      response.append("  - ");
       response.append(headerName);
       response.append(": ");
-      response.append(headerValue);
+
+      while (headerValues.hasMoreElements()) {
+        var headerValue = headerValues.nextElement();
+        response.append(headerValue);
+        if (headerValues.hasMoreElements()) {
+          response.append(", ");
+        }
+      }
       response.append(StringUtils.LF);
     }
     response.append(StringUtils.LF);
@@ -166,7 +187,14 @@ public class BasicController {
     response.append(StringUtils.LF);
     response.append(body);
 
-    return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(response.toString());
+    // Add custom response header "My-Custom-Header" with value is random 6 digits
+    // uppercase alphanumeric
+    var randomString = RandomStringUtils.randomAlphanumeric(3).toUpperCase() + "-"
+        + RandomStringUtils.randomAlphanumeric(3).toUpperCase();
+    var httpResponseHeaders = new org.springframework.http.HttpHeaders();
+    httpResponseHeaders.add("My-Custom-Header", randomString);
+
+    return ResponseEntity.ok().headers(httpResponseHeaders).contentType(MediaType.TEXT_PLAIN).body(response.toString());
   }
 
 }

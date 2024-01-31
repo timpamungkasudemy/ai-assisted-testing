@@ -1,8 +1,8 @@
 package com.course.ai.assistant.api.controller;
 
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.course.ai.assistant.api.request.ProductRequest;
+import com.course.ai.assistant.api.response.PaginationResponse;
 import com.course.ai.assistant.api.response.ProductResponse;
+import com.course.ai.assistant.api.response.ProductSearchResponse;
 import com.course.ai.assistant.constant.JpaConstants;
 import com.course.ai.assistant.constant.JpaConstants.ActiveQueryFlag;
 import com.course.ai.assistant.entity.ProductEntity;
+import com.course.ai.assistant.mapper.ProductMapper;
 import com.course.ai.assistant.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,28 +35,30 @@ public class ProductController {
 
   private ProductService productService;
 
-  public ProductController(ProductService productService) {
+  private ProductMapper productMapper;
+
+  public ProductController(ProductService productService, ProductMapper productMapper) {
     this.productService = productService;
+    this.productMapper = productMapper;
   }
 
   @GetMapping(path = "/{product-uuid}")
   @Operation(summary = "Find product by UUID")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Product found"),
-      @ApiResponse(responseCode = "400", description = "Product with given UUID not found")
-  })
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "Product found"),
+      @ApiResponse(responseCode = "400", description = "Product with given UUID not found") })
   public ProductResponse findByProductUuid(
       @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to find", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid) {
-    return productService.findByProductUuid(productUuid);
+    var entity = productService.findByProductUuid(productUuid);
+    return productMapper.entityToResponse(entity);
   }
 
   @GetMapping(path = "/search")
-  public List<ProductResponse> findByProductNameLike(
-      @RequestParam(name = "name", required = false) @Parameter(description = "Product name (case insensitive)") String name,
-      @RequestParam(name = "sku", required = false) @Parameter(description = "Stock Keeping Unit (SKU)") String sku,
-      @RequestParam(name = "min-price", required = false, defaultValue = "0") @Parameter(description = "Minimum price") Double minPrice,
-      @RequestParam(name = "max-price", required = false, defaultValue = "0") @Parameter(description = "Maximum price") Double maxPrice,
-      @RequestParam(required = false, defaultValue = "ALL") @Parameter(description = """
+  public ProductSearchResponse search(
+      @RequestParam(name = "name", required = false) @Parameter(description = "Find by product name like ... (case insensitive)", example = "chocolate") String name,
+      @RequestParam(name = "sku", required = false) @Parameter(description = "Find by Stock Keeping Unit (SKU) equals ... (case insensitive)", example = "SKU12318") String sku,
+      @RequestParam(name = "min-price", required = false, defaultValue = "0") @Parameter(description = "Minimum price", example = "1") Double minPrice,
+      @RequestParam(name = "max-price", required = false, defaultValue = "0") @Parameter(description = "Maximum price", example = "999") Double maxPrice,
+      @RequestParam(name = "active-flag", required = false, defaultValue = "ALL") @Parameter(description = """
           Active query flag (case insensitive).
           <ul>
             <li><code>ALL</code> - all products</li>
@@ -61,10 +66,10 @@ public class ProductController {
             <li><code>INACTIVE_ONLY</code> - only inactive products</li>
           </ul>
           """) ActiveQueryFlag activeQueryFlag,
-      @RequestParam(required = false, defaultValue = "productName") @Parameter(description = """
+      @RequestParam(name = "sort-by", required = false, defaultValue = "name") @Parameter(description = """
           Sort column (case sensitive).
           <ul>
-            <li><code>productName</code> - sort by product name</li>
+            <li><code>name</code> - sort by product name</li>
             <li><code>stockKeepingUnit</code> - sort by SKU</li>
             <li><code>price</code> - sort by price</li>
             <li><code>active</code> - sort by active flag</li>
@@ -72,31 +77,30 @@ public class ProductController {
             <li><code>updatedAt</code> - sort by update date</li>
           </ul>
           """) String sortColumn,
-      @RequestParam(required = false, defaultValue = "ASC") @Parameter(description = """
+      @RequestParam(name = "sort-direction", required = false, defaultValue = "ASC") @Parameter(description = """
           Sort direction (case insensitive).
           <ul>
             <li><code>ASC</code> - ascending</li>
             <li><code>DESC</code> - descending</li>
           </ul>
-          """) JpaConstants.SortDirection sortDirection) {
-    var entities = productService.search(name, minPrice, maxPrice, sku, activeQueryFlag, sortColumn, sortDirection);
+          """) JpaConstants.SortDirection sortDirection,
+      @RequestParam(name = "page", required = false, defaultValue = "1") @Parameter(description = "Page number (1-based)", example = "1") Integer page,
+      @RequestParam(name = "size", required = false, defaultValue = "20") @Parameter(description = "Page size", example = "20") Integer size) {
+    var pageSearch = productService.search(name, minPrice, maxPrice, sku, activeQueryFlag, sortColumn, sortDirection,
+        Pageable.ofSize(size).withPage(page - 1));
 
-    return null;
+    var pagination = PaginationResponse.builder().page(pageSearch.getNumber() + 1).size(pageSearch.getSize())
+        .totalElements(pageSearch.getTotalElements()).totalPages(pageSearch.getTotalPages()).build();
+    var products = productMapper.entityToResponse(pageSearch.getContent());
+
+    return ProductSearchResponse.builder().data(products).pagination(pagination).build();
   }
 
-  @GetMapping(path = "/price")
-  public List<ProductEntity> findByPriceBetween(@RequestParam Double minPrice, @RequestParam Double maxPrice) {
-    return productService.findByPriceBetween(minPrice, maxPrice);
-  }
-
-  @GetMapping(path = "/sku/{sku}")
-  public ProductEntity findByStockKeepingUnit(@PathVariable String sku) {
-    return productService.findByStockKeepingUnit(sku);
-  }
-
-  @PutMapping(path = "/{id}")
-  public ProductEntity updateProduct(@PathVariable UUID id, @RequestBody ProductRequest updatedProductRequest) {
-    return productService.updateProduct(id, updatedProductRequest);
+  @PutMapping(path = "/{product-uuid}")
+  public ProductEntity updateProduct(
+      @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to update", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid,
+      @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true) ProductRequest updatedProductRequest) {
+    return productService.updateProduct(productUuid, updatedProductRequest);
   }
 
 }

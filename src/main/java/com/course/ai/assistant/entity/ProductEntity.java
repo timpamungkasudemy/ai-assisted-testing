@@ -37,8 +37,8 @@ public class ProductEntity {
   @Column(name = "manufacturer")
   private String manufacturer;
 
-  @Column(name = "base_price", nullable = false)
-  private double basePrice;
+  @Column(name = "price", nullable = false)
+  private double price;
 
   @Column(name = "description")
   private String description;

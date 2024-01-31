@@ -18,7 +18,7 @@ public class ProductResponse {
   private UUID productUuid;
   private String name;
   private String manufacturer;
-  private double basePrice;
+  private double price;
   private String description;
   private String stockKeepingUnit;
   private boolean active;

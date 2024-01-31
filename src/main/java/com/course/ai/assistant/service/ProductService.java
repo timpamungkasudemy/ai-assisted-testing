@@ -1,14 +1,14 @@
 package com.course.ai.assistant.service;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.course.ai.assistant.api.request.ProductRequest;
-import com.course.ai.assistant.api.response.ProductResponse;
 import com.course.ai.assistant.constant.JpaConstants;
 import com.course.ai.assistant.constant.JpaConstants.ActiveQueryFlag;
 import com.course.ai.assistant.constant.JpaConstants.SortDirection;
@@ -34,30 +34,16 @@ public class ProductService {
     productRepository.save(productEntity);
   }
 
-  public ProductResponse findByProductUuid(UUID productUuid) {
-    var productEntity = productRepository.findById(productUuid).orElseThrow();
-    return productMapper.entityToResponse(productEntity);
+  public ProductEntity findByProductUuid(UUID productUuid) {
+    return productRepository.findById(productUuid).orElseThrow();
   }
 
-  public List<ProductEntity> findByProductNameLike(String productName) {
-    return productRepository.findAll(ProductSpecification.productNameLikeIgnoreCase(productName));
-  }
-
-  public List<ProductEntity> findByPriceBetween(Double minPrice, Double maxPrice) {
-    return productRepository.findAll(ProductSpecification.priceBetween(minPrice, maxPrice));
-  }
-
-  public ProductEntity findByStockKeepingUnit(String stockKeepingUnit) {
-    return productRepository.findOne(ProductSpecification.productStockKeepingUnitEqualsIgnoreCase(stockKeepingUnit))
-        .orElseThrow();
-  }
-
-  public List<ProductEntity> search(String name, Double minPrice, Double maxPrice, String sku,
+  public Page<ProductEntity> search(String name, Double minPrice, Double maxPrice, String sku,
       ActiveQueryFlag activeQueryFlag, String sortColumn,
-      SortDirection sortDirection) {
-    return productRepository
-        .findAll(ProductSpecification.search(name, sku, minPrice, maxPrice, activeQueryFlag, sortColumn,
-            sortDirection));
+      SortDirection sortDirection, Pageable pageable) {
+    return productRepository.findAll(
+        ProductSpecification.search(name, sku, minPrice, maxPrice, activeQueryFlag, sortColumn, sortDirection),
+        pageable);
   }
 
   public ProductEntity updateProduct(UUID productUuid, ProductRequest updatedProductRequest) {
@@ -68,7 +54,7 @@ public class ProductService {
     }
 
     var existingProductEntity = queryResult.get();
-    existingProductEntity.setBasePrice(updatedProductRequest.getBasePrice());
+    existingProductEntity.setPrice(updatedProductRequest.getPrice());
     existingProductEntity.setDescription(updatedProductRequest.getDescription());
     existingProductEntity.setManufacturer(updatedProductRequest.getManufacturer());
     existingProductEntity.setName(updatedProductRequest.getName());

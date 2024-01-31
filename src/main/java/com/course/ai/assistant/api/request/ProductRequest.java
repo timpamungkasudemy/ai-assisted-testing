@@ -20,8 +20,8 @@ public class ProductRequest {
   @Max(value = 300, message = "Manufacturer must be less than or equal to 300 characters.")
   private String manufacturer;
 
-  @Min(value = 0, message = "Base price must be greater than or equal to 0.")
-  private double basePrice;
+  @Min(value = 0, message = "Price must be greater than or equal to 0.")
+  private double price;
 
   private String description;
 

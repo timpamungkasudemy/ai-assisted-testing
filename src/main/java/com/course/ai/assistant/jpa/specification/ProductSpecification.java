@@ -14,9 +14,9 @@ import jakarta.persistence.criteria.Predicate;
 
 public class ProductSpecification {
 
-  public static Specification<ProductEntity> productNameLikeIgnoreCase(String productName) {
-    return (root, query, criteriaBuilder) -> criteriaBuilder.equal(criteriaBuilder.upper(root.get("productName")),
-        productName.toUpperCase());
+  public static Specification<ProductEntity> nameLikeIgnoreCase(String name) {
+    return (root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get("name")),
+        "%" + name.toUpperCase() + "%");
   }
 
   public static Specification<ProductEntity> priceBetween(Double minPrice, Double maxPrice) {
@@ -36,7 +36,7 @@ public class ProductSpecification {
 
       if (StringUtils.isNotBlank(name)) {
         predicate = criteriaBuilder.and(predicate,
-            productNameLikeIgnoreCase(name).toPredicate(root, query, criteriaBuilder));
+            nameLikeIgnoreCase(name).toPredicate(root, query, criteriaBuilder));
       }
 
       if (StringUtils.isNotBlank(sku)) {
@@ -44,7 +44,8 @@ public class ProductSpecification {
             productStockKeepingUnitEqualsIgnoreCase(sku).toPredicate(root, query, criteriaBuilder));
       }
 
-      if (Objects.nonNull(minPrice) && Objects.nonNull(maxPrice) && minPrice <= maxPrice) {
+      if (Objects.nonNull(minPrice) && Objects.nonNull(maxPrice) && minPrice > 0 && maxPrice > 0
+          && minPrice <= maxPrice) {
         predicate = criteriaBuilder.and(predicate,
             priceBetween(minPrice, maxPrice).toPredicate(root, query, criteriaBuilder));
       }
@@ -58,12 +59,12 @@ public class ProductSpecification {
 
       if (StringUtils.isNotBlank(sortColumn)) {
         if (Objects.nonNull(sortDirection) && sortDirection == SortDirection.DESC) {
-          query.orderBy(criteriaBuilder.desc(root.get(sortColumn)), criteriaBuilder.asc(root.get("productName")));
+          query.orderBy(criteriaBuilder.desc(root.get(sortColumn)), criteriaBuilder.asc(root.get("name")));
         } else {
-          query.orderBy(criteriaBuilder.asc(root.get(sortColumn)), criteriaBuilder.asc(root.get("productName")));
+          query.orderBy(criteriaBuilder.asc(root.get(sortColumn)), criteriaBuilder.asc(root.get("name")));
         }
       } else {
-        query.orderBy(criteriaBuilder.desc(root.get("updatedAt")), criteriaBuilder.asc(root.get("productName")));
+        query.orderBy(criteriaBuilder.desc(root.get("updatedAt")), criteriaBuilder.asc(root.get("name")));
       }
 
       return predicate;

@@ -2,7 +2,7 @@ MERGE INTO products (
   product_uuid,
   name,
   manufacturer,
-  base_price,
+  price,
   description,
   stock_keeping_unit,
   active,
@@ -83,7 +83,7 @@ VALUES
     9.99,
     'Frozen pepperoni pizza',
     'SKU45298',
-    true,
+    false,
     'administrator',
     'administrator'
   ),
@@ -314,7 +314,7 @@ VALUES
     2.25,
     'Chicken noodle soup',
     'SKU20456',
-    true,
+    false,
     'administrator',
     'administrator'
   ),
@@ -325,7 +325,7 @@ VALUES
     2.99,
     'Oatmeal breakfast bars',
     'SKU20173',
-    true,
+    false,
     'administrator',
     'administrator'
   ),
@@ -336,7 +336,7 @@ VALUES
     2.49,
     'Wheat bread for sandwiches',
     'SKU64967',
-    true,
+    false,
     'administrator',
     'administrator'
   );
