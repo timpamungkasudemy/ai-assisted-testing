@@ -35,90 +35,6 @@ public class BasicController {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-  @GetMapping(path = "/time", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get current time")
-  public SimpleMessageResponse getTime() {
-    var now = DATE_TIME_FORMATTER.format(LocalTime.now());
-    return new SimpleMessageResponse(now);
-  }
-
-  @GetMapping(path = "/fast", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Fast response")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
-  public SimpleMessageResponse fast() {
-    return new SimpleMessageResponse("Response from API, random number: " + RandomStringUtils.randomNumeric(6));
-  }
-
-  @GetMapping(path = "/fast-random", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Fast response, produce random HTTP status.")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
-      @ApiResponse(responseCode = "400", description = "Bad request"),
-      @ApiResponse(responseCode = "403", description = "Forbidden"),
-      @ApiResponse(responseCode = "415", description = "Unsupported media type"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public ResponseEntity<SimpleMessageResponse> fastWithRandomStatus() {
-    return responseWithRandomStatus();
-  }
-
-  private ResponseEntity<SimpleMessageResponse> responseWithRandomStatus() {
-    var random = ThreadLocalRandom.current().nextInt(100);
-
-    switch (random % 10) {
-    case 0:
-      return ResponseEntity.badRequest().body(null);
-    case 1:
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-    case 2:
-      return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
-    case 3:
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    default:
-      return ResponseEntity
-          .ok(new SimpleMessageResponse("Response from API, random number" + RandomStringUtils.randomNumeric(6)));
-    }
-  }
-
-  @GetMapping(path = "/slow", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Slow response, takes 1-3 seconds")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK")
-
-  })
-  public SimpleMessageResponse slow() {
-    DelayUtil.delay(1000, 3000);
-    return new SimpleMessageResponse("Slow response from API");
-  }
-
-  @GetMapping(path = "/slow-random", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Slow response, takes 1-3 seconds. Produce random HTTP status.")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
-      @ApiResponse(responseCode = "400", description = "Bad request"),
-      @ApiResponse(responseCode = "403", description = "Forbidden"),
-      @ApiResponse(responseCode = "415", description = "Unsupported media type"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public ResponseEntity<SimpleMessageResponse> slowWithRandomStatus() {
-    DelayUtil.delay(1000, 3000);
-    return responseWithRandomStatus();
-  }
-
-  @GetMapping(path = "/very-slow/{param}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Very slow response, takes 5 seconds")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK")
-
-  })
-  public SimpleMessageResponse verySlow(@PathVariable("param") String param) {
-    DelayUtil.delay(5000);
-    return new SimpleMessageResponse("Very slow response. The parameter is : " + param + ". Generated on "
-        + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + ". Random number : "
-        + RandomStringUtils.randomNumeric(6));
-  }
-
-  @GetMapping(path = "/who-am-i", produces = MediaType.TEXT_PLAIN_VALUE)
-  @Operation(summary = "Get current IP address")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
-  public String whoAmI() throws SocketException, UnknownHostException {
-    return "I run on " + InetAddress.getLocalHost().getHostAddress();
-  }
-
   @RequestMapping(value = { "/echo" }, consumes = { MediaType.APPLICATION_JSON_VALUE,
       MediaType.TEXT_PLAIN_VALUE }, produces = MediaType.TEXT_PLAIN_VALUE)
   @Operation(summary = "Echo the HTTP request (URL, query parameters, headers, request body).")
@@ -195,6 +111,90 @@ public class BasicController {
     httpResponseHeaders.add("My-Custom-Header", randomString);
 
     return ResponseEntity.ok().headers(httpResponseHeaders).contentType(MediaType.TEXT_PLAIN).body(response.toString());
+  }
+
+  @GetMapping(path = "/fast", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Fast response")
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
+  public SimpleMessageResponse fast() {
+    return new SimpleMessageResponse("Response from API, random number: " + RandomStringUtils.randomNumeric(6));
+  }
+
+  @GetMapping(path = "/fast-random", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Fast response, produce random HTTP status.")
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Bad request"),
+      @ApiResponse(responseCode = "403", description = "Forbidden"),
+      @ApiResponse(responseCode = "415", description = "Unsupported media type"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public ResponseEntity<SimpleMessageResponse> fastWithRandomStatus() {
+    return responseWithRandomStatus();
+  }
+
+  @GetMapping(path = "/time", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get current time")
+  public SimpleMessageResponse getTime() {
+    var now = DATE_TIME_FORMATTER.format(LocalTime.now());
+    return new SimpleMessageResponse(now);
+  }
+
+  private ResponseEntity<SimpleMessageResponse> responseWithRandomStatus() {
+    var random = ThreadLocalRandom.current().nextInt(100);
+
+    switch (random % 10) {
+      case 0:
+        return ResponseEntity.badRequest().body(null);
+      case 1:
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+      case 2:
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
+      case 3:
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+      default:
+        return ResponseEntity
+            .ok(new SimpleMessageResponse("Response from API, random number: " + RandomStringUtils.randomNumeric(6)));
+    }
+  }
+
+  @GetMapping(path = "/slow", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Slow response, takes 1-3 seconds")
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK")
+
+  })
+  public SimpleMessageResponse slow() {
+    DelayUtil.delay(1000, 3000);
+    return new SimpleMessageResponse("Slow response from API");
+  }
+
+  @GetMapping(path = "/slow-random", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Slow response, takes 1-3 seconds. Produce random HTTP status.")
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Bad request"),
+      @ApiResponse(responseCode = "403", description = "Forbidden"),
+      @ApiResponse(responseCode = "415", description = "Unsupported media type"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public ResponseEntity<SimpleMessageResponse> slowWithRandomStatus() {
+    DelayUtil.delay(1000, 3000);
+    return responseWithRandomStatus();
+  }
+
+  @GetMapping(path = "/very-slow/{param}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Very slow response, takes 5 seconds")
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK")
+
+  })
+  public SimpleMessageResponse verySlow(@PathVariable("param") String param) {
+    DelayUtil.delay(5000);
+    return new SimpleMessageResponse("Very slow response. The parameter is : " + param + ". Generated on "
+        + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + ". Random number : "
+        + RandomStringUtils.randomNumeric(6));
+  }
+
+  @GetMapping(path = "/who-am-i", produces = MediaType.TEXT_PLAIN_VALUE)
+  @Operation(summary = "Get current IP address")
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
+  public String whoAmI() throws SocketException, UnknownHostException {
+    return "I run on " + InetAddress.getLocalHost().getHostAddress();
   }
 
 }

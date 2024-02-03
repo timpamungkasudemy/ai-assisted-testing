@@ -4,8 +4,10 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.course.ai.assistant.api.request.ProductRequest;
 import com.course.ai.assistant.api.response.PaginationResponse;
+import com.course.ai.assistant.api.response.ProductCreateResponse;
 import com.course.ai.assistant.api.response.ProductResponse;
 import com.course.ai.assistant.api.response.ProductSearchResponse;
 import com.course.ai.assistant.constant.JpaConstants;
@@ -40,6 +43,17 @@ public class ProductController {
   public ProductController(ProductService productService, ProductMapper productMapper) {
     this.productService = productService;
     this.productMapper = productMapper;
+  }
+
+  @PostMapping(path = "")
+  @Operation(summary = "Create a new product")
+  @ApiResponses({ @ApiResponse(responseCode = "201", description = "Product created") })
+  public ResponseEntity<ProductCreateResponse> createProduct(
+      @RequestBody(required = true) ProductRequest newProduct) {
+    var newEntity = productService.createProduct(newProduct);
+    var responseBody = ProductCreateResponse.builder().productUuid(newEntity.getProductUuid()).build();
+
+    return ResponseEntity.created(null).body(responseBody);
   }
 
   @GetMapping(path = "/{product-uuid}")
@@ -99,7 +113,7 @@ public class ProductController {
   @PutMapping(path = "/{product-uuid}")
   public ProductEntity updateProduct(
       @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to update", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid,
-      @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true) ProductRequest updatedProductRequest) {
+      @RequestBody(required = true) ProductRequest updatedProductRequest) {
     return productService.updateProduct(productUuid, updatedProductRequest);
   }
 

@@ -29,9 +29,9 @@ public class ProductService {
     this.productRepository = productRepository;
   }
 
-  public void createProduct(ProductRequest productRequest) {
+  public ProductEntity createProduct(ProductRequest productRequest) {
     var productEntity = productMapper.requestToEntity(productRequest);
-    productRepository.save(productEntity);
+    return productRepository.save(productEntity);
   }
 
   public ProductEntity findByProductUuid(UUID productUuid) {

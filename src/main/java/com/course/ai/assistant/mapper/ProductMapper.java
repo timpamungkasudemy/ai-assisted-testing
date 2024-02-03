@@ -12,6 +12,8 @@ import com.course.ai.assistant.entity.ProductEntity;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
+  List<ProductResponse> entityToResponse(List<ProductEntity> entityList);
+
   ProductResponse entityToResponse(ProductEntity entity);
 
   @Mapping(target = "createdAt", ignore = true)
@@ -20,7 +22,5 @@ public interface ProductMapper {
   @Mapping(target = "updatedBy", ignore = true)
   @Mapping(target = "productUuid", ignore = true)
   ProductEntity requestToEntity(ProductRequest request);
-
-  List<ProductResponse> entityToResponse(List<ProductEntity> entityList);
 
 }
