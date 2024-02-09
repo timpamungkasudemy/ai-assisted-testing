@@ -197,4 +197,22 @@ public class BasicController {
     return "I run on " + InetAddress.getLocalHost().getHostAddress();
   }
 
+  @GetMapping(path = "/slow-if-error", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = """
+      Fast if the HTTP status response code is 2xx or 3xx. Otherwise, takes 1-3 seconds. Produce random HTTP status.
+      """)
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Bad request"),
+      @ApiResponse(responseCode = "403", description = "Forbidden"),
+      @ApiResponse(responseCode = "415", description = "Unsupported media type"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public ResponseEntity<SimpleMessageResponse> slowIfError() {
+    var response = responseWithRandomStatus();
+
+    if (!response.getStatusCode().is2xxSuccessful()) {
+      DelayUtil.delay(1000, 3000);
+    }
+
+    return response;
+  }
 }

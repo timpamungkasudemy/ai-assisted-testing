@@ -1,6 +1,7 @@
 package com.course.ai.assistant.api.response;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.course.ai.assistant.constant.JsonFormatConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -14,8 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Transaction {
+public class TransactionResponse {
 
+  private UUID transactionId;
   private String transactionNumber;
 
   @JsonFormat(pattern = JsonFormatConstants.ISO_DATE_FORMAT)
