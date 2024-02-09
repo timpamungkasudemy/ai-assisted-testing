@@ -123,6 +123,7 @@ public class BasicController {
   @GetMapping(path = "/fast-random", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Fast response, produce random HTTP status.")
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "202", description = "Accepted"),
       @ApiResponse(responseCode = "400", description = "Bad request"),
       @ApiResponse(responseCode = "403", description = "Forbidden"),
       @ApiResponse(responseCode = "415", description = "Unsupported media type"),
@@ -150,6 +151,10 @@ public class BasicController {
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
       case 3:
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+      case 4:
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+            new SimpleMessageResponse(
+                "Response from API, random alphabet: " + RandomStringUtils.randomAlphabetic(6).toUpperCase()));
       default:
         return ResponseEntity
             .ok(new SimpleMessageResponse("Response from API, random number: " + RandomStringUtils.randomNumeric(6)));
@@ -169,6 +174,7 @@ public class BasicController {
   @GetMapping(path = "/slow-random", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Slow response, takes 1-3 seconds. Produce random HTTP status.")
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "202", description = "Accepted"),
       @ApiResponse(responseCode = "400", description = "Bad request"),
       @ApiResponse(responseCode = "403", description = "Forbidden"),
       @ApiResponse(responseCode = "415", description = "Unsupported media type"),
@@ -199,9 +205,10 @@ public class BasicController {
 
   @GetMapping(path = "/slow-if-error", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = """
-      Fast if the HTTP status response code is 2xx or 3xx. Otherwise, takes 1-3 seconds. Produce random HTTP status.
+      Fast if the HTTP status response code is 2xx. Otherwise, takes 1-3 seconds. Produce random HTTP status.
       """)
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "202", description = "Accepted"),
       @ApiResponse(responseCode = "400", description = "Bad request"),
       @ApiResponse(responseCode = "403", description = "Forbidden"),
       @ApiResponse(responseCode = "415", description = "Unsupported media type"),
