@@ -34,7 +34,7 @@ public class BasicAuthFilter extends OncePerRequestFilter {
 
     if (!AuthorizationDummyConstants.VALID_USERS.containsKey(values[0].toLowerCase())
         || !AuthorizationDummyConstants.VALID_USERS.get(values[0].toLowerCase()).equals(values[1])) {
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password");
       return;
     }
 

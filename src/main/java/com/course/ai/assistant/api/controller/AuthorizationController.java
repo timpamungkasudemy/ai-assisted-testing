@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,7 @@ public class AuthorizationController {
   @Operation(summary = "Login to get access token", security = {
       @SecurityRequirement(name = "basicAuth")
   })
-  public ResponseEntity<AccessTokenResponse> login() {
+  public ResponseEntity<AccessTokenResponse> login(@RequestHeader("Authorization") String authorizationHeader) {
     var validToken = AuthorizationDummyConstants.VALID_BEARERS
         .get(ThreadLocalRandom.current().nextInt(0, AuthorizationDummyConstants.VALID_BEARERS.size()));
     return ResponseEntity.ok().body(AccessTokenResponse.builder().accessToken(validToken).build());
