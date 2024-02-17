@@ -35,8 +35,8 @@ public class TransactionController {
   @Autowired
   private Faker faker;
 
-  @GetMapping(path = "/v1/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get transactions by transaction IDs (UUID)", security = {
+  @GetMapping(path = "/v1/transactions/fake", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get fake transactions by transaction IDs (UUID)", security = {
       @SecurityRequirement(name = "bearerAuth")
   })
   public List<TransactionResponse> getTransactions(

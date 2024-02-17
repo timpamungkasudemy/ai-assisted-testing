@@ -45,7 +45,7 @@ public class ProductController {
     this.productMapper = productMapper;
   }
 
-  @PostMapping(path = "")
+  @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Create a new product")
   @ApiResponses({ @ApiResponse(responseCode = "201", description = "Product created") })
   public ResponseEntity<ProductCreateResponse> createProduct(
@@ -56,7 +56,7 @@ public class ProductController {
     return ResponseEntity.created(null).body(responseBody);
   }
 
-  @GetMapping(path = "/{product-uuid}")
+  @GetMapping(path = "/{product-uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Find product by UUID")
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "Product found"),
       @ApiResponse(responseCode = "400", description = "Product with given UUID not found") })
@@ -66,7 +66,7 @@ public class ProductController {
     return productMapper.entityToResponse(entity);
   }
 
-  @GetMapping(path = "/search")
+  @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
   public ProductSearchResponse search(
       @RequestParam(name = "name", required = false) @Parameter(description = "Find by product name like ... (case insensitive)", example = "chocolate") String name,
       @RequestParam(name = "sku", required = false) @Parameter(description = "Find by Stock Keeping Unit (SKU) equals ... (case insensitive)", example = "SKU12318") String sku,
@@ -110,7 +110,7 @@ public class ProductController {
     return ProductSearchResponse.builder().data(products).pagination(pagination).build();
   }
 
-  @PutMapping(path = "/{product-uuid}")
+  @PutMapping(path = "/{product-uuid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ProductEntity updateProduct(
       @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to update", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid,
       @RequestBody(required = true) ProductRequest updatedProductRequest) {

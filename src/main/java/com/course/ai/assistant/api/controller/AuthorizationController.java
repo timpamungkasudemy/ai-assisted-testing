@@ -22,7 +22,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AuthorizationController {
 
   @PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Login to get access token", security = {
+  @Operation(summary = "Login to get access token", description = """
+      Valid username & passwords for sample are:
+      <ul>
+        <li><code>administrator / AdministratorPassword</code></li>
+        <li><code>operator.one / OperatorOnePassword</code></li>
+        <li><code>operator.two / OperatorTwoPassword</code></li>
+      </ul>
+      """, security = {
       @SecurityRequirement(name = "basicAuth")
   })
   public ResponseEntity<AccessTokenResponse> login(@RequestHeader("Authorization") String authorizationHeader) {
