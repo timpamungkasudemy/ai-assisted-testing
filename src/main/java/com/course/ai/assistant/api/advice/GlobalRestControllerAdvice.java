@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,7 +16,7 @@ import com.course.ai.assistant.constant.ErrorMessageConstants;
 public class GlobalRestControllerAdvice {
 
   @ExceptionHandler(value = { NoSuchElementException.class })
-  public ResponseEntity<ErrorMessageResponse> handleAnyNotFoundException(Exception ex) {
+  public ResponseEntity<ErrorMessageResponse> handleAnyNotFoundException(NoSuchElementException ex) {
     var errorMessage = ErrorMessageResponse.builder()
         .code(ErrorMessageConstants.CODE_DATA_NOT_FOUND)
         .cause(ex.getMessage())
@@ -41,4 +42,15 @@ public class GlobalRestControllerAdvice {
     return ResponseEntity.badRequest().body(errorMessage);
   }
 
+  @ExceptionHandler(value = { HttpMessageNotReadableException.class })
+  public ResponseEntity<ErrorMessageResponse> handleHttpMessageNotReadableException(
+      HttpMessageNotReadableException ex) {
+    var errorMessage = ErrorMessageResponse.builder()
+        .code(ErrorMessageConstants.CODE_HTTP_MESSAGE_NOT_READABLE)
+        .cause(ex.getMessage())
+        .message(ErrorMessageConstants.MESSAGE_HTTP_MESSAGE_NOT_READABLE)
+        .build();
+
+    return ResponseEntity.badRequest().body(errorMessage);
+  }
 }

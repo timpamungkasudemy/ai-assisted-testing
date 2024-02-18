@@ -9,17 +9,23 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.course.ai.assistant.api.request.CreateCustomerRequest;
+import com.course.ai.assistant.api.response.CreateCustomerResponse;
 import com.course.ai.assistant.api.response.CustomerResponse;
 import com.github.javafaker.Faker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/api/customer", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -136,7 +142,18 @@ public class CustomerController {
         .contacts(contacts)
         .customerUuid(UUID.randomUUID())
         .fullName(faker.name().fullName())
-        .memberNumber(faker.number().digits(8))
+        .memberNumber(faker.number().digits(12))
         .build();
+  }
+
+  @PostMapping(path = "/fake", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Create fake customer", description = "<p>Create fake customer with given data. "
+      + "If all submitted data are valid, will return random customer UUID and member number</p>")
+  public ResponseEntity<CreateCustomerResponse> createCustomer(@RequestBody @Valid CreateCustomerRequest request) {
+    final var customerUuid = UUID.randomUUID();
+    final var memberNumber = faker.number().digits(12);
+
+    return ResponseEntity.created(null)
+        .body(CreateCustomerResponse.builder().customerUuid(customerUuid).memberNumber(memberNumber).build());
   }
 }
