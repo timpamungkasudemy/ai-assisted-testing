@@ -20,7 +20,6 @@ import com.course.ai.assistant.api.response.TransactionResponse;
 import com.github.javafaker.Faker;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,9 +35,7 @@ public class TransactionController {
   private Faker faker;
 
   @GetMapping(path = "/v1/transactions/fake", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get fake transactions by transaction IDs (UUID)", security = {
-      @SecurityRequirement(name = "bearerAuth")
-  })
+  @Operation(summary = "Get fake transactions by transaction IDs (UUID)")
   public List<TransactionResponse> getTransactions(
       @RequestParam(name = "transaction-ids", required = true) Set<String> transactionIds) {
     var response = new ArrayList<TransactionResponse>(transactionIds.size());

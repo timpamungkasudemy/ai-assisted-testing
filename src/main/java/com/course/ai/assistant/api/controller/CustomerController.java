@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,13 @@ public class CustomerController {
   @Operation(summary = "Get fake customer")
   @GetMapping(path = "/fake", produces = MediaType.APPLICATION_JSON_VALUE)
   public CustomerResponse getFakeCustomer() {
-    return generateFakeCustomer();
+    return generateFakeCustomer(null);
+  }
+
+  @Operation(summary = "Get fake customer with parameter customer UUID")
+  @GetMapping(path = "/fake/{customer-uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerResponse getFakeCustomer(@PathVariable(name = "customer-uuid") UUID customerUuid) {
+    return generateFakeCustomer(customerUuid);
   }
 
   // find customer by name
@@ -49,7 +56,7 @@ public class CustomerController {
     final var customers = new ArrayList<CustomerResponse>();
 
     for (int i = 0; i < ThreadLocalRandom.current().nextInt(1, 5); i++) {
-      final var customer = generateFakeCustomer();
+      final var customer = generateFakeCustomer(null);
       final var generateCorrectData = ThreadLocalRandom.current().nextInt(1, 5) < 4 ? true : false;
 
       if (generateCorrectData) {
@@ -65,7 +72,7 @@ public class CustomerController {
     return customers;
   }
 
-  private CustomerResponse generateFakeCustomer() {
+  private CustomerResponse generateFakeCustomer(UUID existingUuid) {
     final var birthDate = faker.date().birthday(18, 65).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     final var homeAddress = CustomerResponse.Address.builder().street(faker.address().streetAddress())
         .city(faker.address().city())
@@ -140,7 +147,7 @@ public class CustomerController {
         .addresses(addresses)
         .birthDate(birthDate)
         .contacts(contacts)
-        .customerUuid(UUID.randomUUID())
+        .customerUuid(existingUuid == null ? UUID.randomUUID() : existingUuid)
         .fullName(faker.name().fullName())
         .memberNumber(faker.number().digits(12))
         .build();

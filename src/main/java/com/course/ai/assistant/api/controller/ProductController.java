@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -46,7 +47,9 @@ public class ProductController {
   }
 
   @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Create a new product")
+  @Operation(summary = "Create a new product", security = {
+      @SecurityRequirement(name = "bearerAuth")
+  })
   @ApiResponses({ @ApiResponse(responseCode = "201", description = "Product created") })
   public ResponseEntity<ProductCreateResponse> createProduct(
       @RequestBody(required = true) ProductRequest newProduct) {
@@ -57,7 +60,9 @@ public class ProductController {
   }
 
   @GetMapping(path = "/{product-uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Find product by UUID")
+  @Operation(summary = "Find product by UUID", security = {
+      @SecurityRequirement(name = "bearerAuth")
+  })
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "Product found"),
       @ApiResponse(responseCode = "400", description = "Product with given UUID not found") })
   public ProductResponse findByProductUuid(
@@ -67,6 +72,9 @@ public class ProductController {
   }
 
   @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Search products", security = {
+      @SecurityRequirement(name = "bearerAuth")
+  })
   public ProductSearchResponse search(
       @RequestParam(name = "name", required = false) @Parameter(description = "Find by product name like ... (case insensitive)", example = "chocolate") String name,
       @RequestParam(name = "sku", required = false) @Parameter(description = "Find by Stock Keeping Unit (SKU) equals ... (case insensitive)", example = "SKU12318") String sku,
@@ -111,6 +119,9 @@ public class ProductController {
   }
 
   @PutMapping(path = "/{product-uuid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Update product by UUID", security = {
+      @SecurityRequirement(name = "bearerAuth")
+  })
   public ProductEntity updateProduct(
       @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to update", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid,
       @RequestBody(required = true) ProductRequest updatedProductRequest) {

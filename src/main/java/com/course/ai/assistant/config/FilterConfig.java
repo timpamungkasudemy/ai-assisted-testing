@@ -16,7 +16,7 @@ public class FilterConfig {
     var registrationBean = new FilterRegistrationBean<AuthBearerFilter>();
 
     registrationBean.setFilter(new AuthBearerFilter());
-    registrationBean.addUrlPatterns("/api/transaction/*");
+    registrationBean.addUrlPatterns("/api/product/*");
 
     return registrationBean;
   }
