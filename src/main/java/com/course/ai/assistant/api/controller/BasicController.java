@@ -204,11 +204,13 @@ public class BasicController {
         + RandomStringUtils.randomNumeric(6));
   }
 
-  @GetMapping(path = "/who-am-i", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/who-am-i", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get current IP address")
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
-  public String whoAmI() throws SocketException, UnknownHostException {
-    return "I run on " + InetAddress.getLocalHost().getHostAddress();
+  public ResponseEntity<SimpleMessageResponse> whoAmI() throws SocketException, UnknownHostException {
+    return ResponseEntity.ok()
+        .body(
+            SimpleMessageResponse.builder().message("I run on " + InetAddress.getLocalHost().getHostAddress()).build());
   }
 
   @GetMapping(path = "/slow-if-error", produces = MediaType.APPLICATION_JSON_VALUE)
