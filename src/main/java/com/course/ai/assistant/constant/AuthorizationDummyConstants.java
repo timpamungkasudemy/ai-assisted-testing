@@ -21,6 +21,7 @@ public final class AuthorizationDummyConstants {
     VALID_USERS.put("administrator".toLowerCase(), "AdministratorPassword");
     VALID_USERS.put("operator.one".toLowerCase(), "OperatorOnePassword");
     VALID_USERS.put("operator.two".toLowerCase(), "OperatorTwoPassword");
+    VALID_USERS.put("guest".toLowerCase(), "GuestPassword");
   }
 
 }

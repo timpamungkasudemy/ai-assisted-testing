@@ -23,12 +23,19 @@ public class AuthorizationController {
 
   @PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Login to get access token", description = """
+      <p>
       Valid username & passwords for sample are:
       <ul>
         <li><code>administrator / AdministratorPassword</code></li>
         <li><code>operator.one / OperatorOnePassword</code></li>
         <li><code>operator.two / OperatorTwoPassword</code></li>
       </ul>
+      The usernames above does not have rate limits.
+      </p>
+      <p>
+      A username <code>guest</code> is also available with password <code>GuestPassword</code>.
+      The rate limit for <code>guest</code> user is <strong>30 requests per minute</strong>.
+      </p>
       """, security = {
       @SecurityRequirement(name = "basicAuth")
   })
