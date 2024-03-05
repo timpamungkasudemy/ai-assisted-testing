@@ -65,4 +65,8 @@ public class ProductService {
     return productRepository.save(existingProductEntity);
   }
 
+  public void deleteByProductUuid(UUID productUuid) {
+    productRepository.deleteById(productUuid);
+  }
+
 }

@@ -13,6 +13,7 @@ import com.course.ai.assistant.api.response.AccessTokenResponse;
 import com.course.ai.assistant.constant.AuthorizationDummyConstants;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -35,9 +36,14 @@ public class AuthorizationController {
       <p>
       A username <code>guest</code> is also available with password <code>GuestPassword</code>.
       The rate limit for <code>guest</code> user is <strong>30 requests per minute</strong>.
+      If the rate limit exceeded, the API response will be <code>429 Too Many Requests</code>.
       </p>
       """, security = {
       @SecurityRequirement(name = "basicAuth")
+  }, responses = {
+      @ApiResponse(responseCode = "200", description = "Access token is generated"),
+      @ApiResponse(responseCode = "401", description = "Invalid username or password"),
+      @ApiResponse(responseCode = "429", description = "Rate limit exceeded (for <code>guest</code> user)")
   })
   public ResponseEntity<AccessTokenResponse> login(@RequestHeader("Authorization") String authorizationHeader) {
     var validToken = AuthorizationDummyConstants.VALID_BEARERS

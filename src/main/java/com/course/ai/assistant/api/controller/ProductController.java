@@ -2,9 +2,11 @@ package com.course.ai.assistant.api.controller;
 
 import java.util.UUID;
 
+import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,6 +71,19 @@ public class ProductController {
       @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to find", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid) {
     var entity = productService.findByProductUuid(productUuid);
     return productMapper.entityToResponse(entity);
+  }
+
+  @DeleteMapping(path = "/{product-uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Delete product by UUID. Will always return HTTP 200 regardless you pass "
+      + "existing <code>product-uuid</code> or not", security = {
+          @SecurityRequirement(name = "bearerAuth")
+      })
+  @ApiResponses({ @ApiResponse(responseCode = "200", description = "Product deleted") })
+  public ResponseEntity<SimpleMessage> deleteByProductUuid(
+      @PathVariable(name = "product-uuid", required = true) @Parameter(name = "product-uuid", description = "Product UUID to delete", example = "d961c1ff-0580-4f49-9b65-463e9ed63652") UUID productUuid) {
+    productService.deleteByProductUuid(productUuid);
+
+    return ResponseEntity.ok(new SimpleMessage("Product deleted"));
   }
 
   @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)

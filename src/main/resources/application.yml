@@ -18,11 +18,11 @@ spring:
       settings:
         trace: false
         web-allow-others: false
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  # jpa:
+  #   show-sql: true
+  #   properties:
+  #     hibernate:
+  #       format_sql: true
 
 server:
   servlet:
@@ -33,7 +33,7 @@ flyway:
   baselineOnMigrate: true
 
 springdoc:
-  show-actuator: false
+  show-actuator: true
   swagger-ui:
     enabled: true
     supported-submit-methods: []
@@ -44,13 +44,13 @@ springdoc:
 logging:
   pattern:
     console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(---){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr(%10t){magenta} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        orm:
-          jdbc:
-            bind: TRACE
+  # level:
+  #   org:
+  #     hibernate:
+  #       SQL: DEBUG
+  #       orm:
+  #         jdbc:
+  #           bind: TRACE
 
 management:
   endpoint:
