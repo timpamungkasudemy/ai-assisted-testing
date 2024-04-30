@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.course.ai.assistant.api.request.CreateCustomerRequest;
 import com.course.ai.assistant.api.response.CreateCustomerResponse;
 import com.course.ai.assistant.api.response.CustomerResponse;
-import com.github.javafaker.Faker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import net.datafaker.Faker;
 
 @RestController
 @RequestMapping(path = "/api/customer", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -75,34 +75,23 @@ public class CustomerController {
   private CustomerResponse generateFakeCustomer(UUID existingUuid) {
     final var birthDate = faker.date().birthday(18, 65).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     final var homeAddress = CustomerResponse.Address.builder().street(faker.address().streetAddress())
-        .city(faker.address().city())
-        .province(faker.address().state())
-        .country(faker.address().country())
-        .zipCode(faker.address().zipCode())
-        .type(CustomerResponse.AddressType.HOME)
+        .city(faker.address().city()).province(faker.address().state()).country(faker.address().country())
+        .zipCode(faker.address().zipCode()).type(CustomerResponse.AddressType.HOME)
         .coordinate(CustomerResponse.Coordinate.builder().latitude(Double.parseDouble(faker.address().latitude()))
-            .longitude(Double.parseDouble(faker.address().longitude()))
-            .build())
+            .longitude(Double.parseDouble(faker.address().longitude())).build())
         .build();
     final var officeAddress = CustomerResponse.Address.builder().street(faker.address().streetAddress())
-        .city(faker.address().city())
-        .province(faker.address().state())
-        .country(faker.address().country())
-        .zipCode(faker.address().zipCode())
-        .type(CustomerResponse.AddressType.OFFICE)
+        .city(faker.address().city()).province(faker.address().state()).country(faker.address().country())
+        .zipCode(faker.address().zipCode()).type(CustomerResponse.AddressType.OFFICE)
         .coordinate(CustomerResponse.Coordinate.builder().latitude(Double.parseDouble(faker.address().latitude()))
-            .longitude(Double.parseDouble(faker.address().longitude()))
-            .build())
+            .longitude(Double.parseDouble(faker.address().longitude())).build())
         .build();
     final var contactEmail = CustomerResponse.Contact.builder().type(CustomerResponse.ContactType.EMAIL)
-        .contactDetail(faker.internet().emailAddress())
-        .build();
+        .contactDetail(faker.internet().emailAddress()).build();
     final var contactPhoneNumber = CustomerResponse.Contact.builder().type(CustomerResponse.ContactType.PHONE_NUMBER)
-        .contactDetail(faker.phoneNumber().phoneNumber())
-        .build();
+        .contactDetail(faker.phoneNumber().phoneNumber()).build();
     final var contactInstagram = CustomerResponse.Contact.builder().type(CustomerResponse.ContactType.INSTAGRAM)
-        .contactDetail(faker.name().username())
-        .build();
+        .contactDetail(faker.name().username()).build();
 
     final var addresses = new ArrayList<CustomerResponse.Address>();
 
@@ -111,46 +100,41 @@ public class CustomerController {
 
     // randomly add homeAddress, officeAddress, or both to addresses
     switch (ThreadLocalRandom.current().nextInt(3)) {
-      case 0:
-        addresses.add(homeAddress);
-        break;
-      case 1:
-        addresses.add(officeAddress);
-        break;
-      case 2:
-        addresses.add(homeAddress);
-        addresses.add(officeAddress);
-        break;
-      default:
-        break;
+    case 0:
+      addresses.add(homeAddress);
+      break;
+    case 1:
+      addresses.add(officeAddress);
+      break;
+    case 2:
+      addresses.add(homeAddress);
+      addresses.add(officeAddress);
+      break;
+    default:
+      break;
     }
 
     // randomly add either contactPhoneNumber, contactInstagram, or both to contacts
     switch (ThreadLocalRandom.current().nextInt(3)) {
-      case 0:
-        contacts.add(contactPhoneNumber);
-        break;
-      case 1:
-        contacts.add(contactInstagram);
-        break;
-      case 2:
-        contacts.add(contactPhoneNumber);
-        contacts.add(contactInstagram);
-        break;
-      default:
-        break;
+    case 0:
+      contacts.add(contactPhoneNumber);
+      break;
+    case 1:
+      contacts.add(contactInstagram);
+      break;
+    case 2:
+      contacts.add(contactPhoneNumber);
+      contacts.add(contactInstagram);
+      break;
+    default:
+      break;
     }
 
     Collections.shuffle(contacts);
 
-    return CustomerResponse.builder().birthDate(birthDate)
-        .addresses(addresses)
-        .birthDate(birthDate)
-        .contacts(contacts)
-        .customerUuid(existingUuid == null ? UUID.randomUUID() : existingUuid)
-        .fullName(faker.name().fullName())
-        .memberNumber(faker.number().digits(12))
-        .build();
+    return CustomerResponse.builder().birthDate(birthDate).addresses(addresses).birthDate(birthDate).contacts(contacts)
+        .customerUuid(existingUuid == null ? UUID.randomUUID() : existingUuid).fullName(faker.name().fullName())
+        .memberNumber(faker.number().digits(12)).build();
   }
 
   @PostMapping(path = "/fake", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

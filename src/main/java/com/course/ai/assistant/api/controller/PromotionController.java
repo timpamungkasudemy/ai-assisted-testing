@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.course.ai.assistant.api.response.SimpleMessageResponse;
-import com.github.javafaker.Faker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import net.datafaker.Faker;
 
 @RestController
 @Tag(name = "Promotion")
@@ -34,9 +34,8 @@ public class PromotionController {
   @GetMapping(path = "/html/promotion/detail/{promotion-code}", produces = MediaType.TEXT_HTML_VALUE)
   public ResponseEntity<String> getPromotionDetails(@PathVariable(name = "promotion-code") String promotionCode) {
     // show the promotionCode in the page
-    return ResponseEntity
-        .ok("<html><head><title>" + promotionCode + "</title></head><body><h2>Promotion details for: <strong>"
-            + promotionCode + "</strong></h2></body></html>");
+    return ResponseEntity.ok("<html><head><title>" + promotionCode
+        + "</title></head><body><h2>Promotion details for: <strong>" + promotionCode + "</strong></h2></body></html>");
   }
 
   @Operation(summary = "Generate article")

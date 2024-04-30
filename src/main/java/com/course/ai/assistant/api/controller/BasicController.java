@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.course.ai.assistant.api.response.CustomDelayResponse;
 import com.course.ai.assistant.api.response.SimpleMessageResponse;
 import com.course.ai.assistant.util.DelayUtil;
-import com.github.javafaker.Faker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import net.datafaker.Faker;
 
 @RestController
 @RequestMapping(path = "/api/basic", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -151,21 +151,20 @@ public class BasicController {
     var random = ThreadLocalRandom.current().nextInt(100);
 
     switch (random % 10) {
-      case 0:
-        return ResponseEntity.badRequest().body(null);
-      case 1:
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-      case 2:
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
-      case 3:
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-      case 4:
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-            new SimpleMessageResponse(
-                "Response from API, random alphabet: " + RandomStringUtils.randomAlphabetic(6).toUpperCase()));
-      default:
-        return ResponseEntity
-            .ok(new SimpleMessageResponse("Response from API, random number: " + RandomStringUtils.randomNumeric(6)));
+    case 0:
+      return ResponseEntity.badRequest().body(null);
+    case 1:
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    case 2:
+      return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
+    case 3:
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    case 4:
+      return ResponseEntity.status(HttpStatus.ACCEPTED).body(new SimpleMessageResponse(
+          "Response from API, random alphabet: " + RandomStringUtils.randomAlphabetic(6).toUpperCase()));
+    default:
+      return ResponseEntity
+          .ok(new SimpleMessageResponse("Response from API, random number: " + RandomStringUtils.randomNumeric(6)));
     }
   }
 
@@ -208,9 +207,8 @@ public class BasicController {
   @Operation(summary = "Get current IP address")
   @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
   public ResponseEntity<SimpleMessageResponse> whoAmI() throws SocketException, UnknownHostException {
-    return ResponseEntity.ok()
-        .body(
-            SimpleMessageResponse.builder().message("I run on " + InetAddress.getLocalHost().getHostAddress()).build());
+    return ResponseEntity.ok().body(
+        SimpleMessageResponse.builder().message("I run on " + InetAddress.getLocalHost().getHostAddress()).build());
   }
 
   @GetMapping(path = "/slow-if-error", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -229,14 +227,10 @@ public class BasicController {
     httpHeaders.add("X-Boolean", Boolean.toString(ThreadLocalRandom.current().nextBoolean()));
 
     if (response.getStatusCode().is2xxSuccessful()) {
-      response = ResponseEntity.status(response.getStatusCode())
-          .headers(httpHeaders)
-          .body(response.getBody());
+      response = ResponseEntity.status(response.getStatusCode()).headers(httpHeaders).body(response.getBody());
     } else {
-      response = ResponseEntity.status(response.getStatusCode())
-          .headers(httpHeaders)
-          .body(new SimpleMessageResponse(
-              "Error from API: " + faker.color().name()));
+      response = ResponseEntity.status(response.getStatusCode()).headers(httpHeaders)
+          .body(new SimpleMessageResponse("Error from API: " + faker.color().name()));
       DelayUtil.delay(1000, 2950);
     }
 
@@ -254,8 +248,7 @@ public class BasicController {
     DelayUtil.delay(delay);
     var identifierValue = StringUtils.isBlank(identifier) ? RandomStringUtils.randomAlphabetic(6).toUpperCase()
         : identifier;
-    var message = "Response from API, custom delay " + delay + " ms. Identifier: "
-        + identifierValue;
+    var message = "Response from API, custom delay " + delay + " ms. Identifier: " + identifierValue;
 
     return ResponseEntity.ok().body(new CustomDelayResponse(delay, identifier, message));
   }

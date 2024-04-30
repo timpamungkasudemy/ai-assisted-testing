@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.course.ai.assistant.api.response.TransactionResponse;
-import com.github.javafaker.Faker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.datafaker.Faker;
 
 @RestController
 @RequestMapping(path = "/api/transaction", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,12 +55,8 @@ public class TransactionController {
         var transaction = TransactionResponse.builder().currency("USD")
             .description(faker.food().vegetable() + ", " + faker.food().fruit())
             .paymentMethod(PAYMENT_METHODS.get(ThreadLocalRandom.current().nextInt(0, PAYMENT_METHODS.size())))
-            .transactionDate(transactionDate)
-            .netAmount(netAmount)
-            .taxAmount(taxAmount)
-            .transactionNumber(transactionNumber)
-            .transactionId(UUID.fromString(transactionId))
-            .build();
+            .transactionDate(transactionDate).netAmount(netAmount).taxAmount(taxAmount)
+            .transactionNumber(transactionNumber).transactionId(UUID.fromString(transactionId)).build();
 
         response.add(transaction);
       } catch (IllegalArgumentException e) {

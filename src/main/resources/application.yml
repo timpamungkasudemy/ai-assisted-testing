@@ -4,7 +4,7 @@ spring:
   application:
     name: alphamart
   datasource:
-    url: jdbc:h2:file:./ai-assistant.h2
+    url: jdbc:h2:mem:ai-assistant-db
     username: sa
     password: password
   jackson:
